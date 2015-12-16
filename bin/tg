@@ -2,11 +2,12 @@
 
 require 'pathname'
 require "Trollop"
-lib = (Pathname.new(__FILE__).realpath.dirname  + '../lib').to_s
-$LOAD_PATH.unshift(lib) if File.directory?(lib) && !$LOAD_PATH.include?(lib)
+
+# lib = (Pathname.new(__FILE__).realpath.dirname  + '../lib').to_s
+# $LOAD_PATH.unshift(lib) if File.directory?(lib) && !$LOAD_PATH.include?(lib)
 
 require 'TrackGit'
-
+# puts TrackGit.methods
 track = TrackGit.new
 
 SUB_COMMANDS = %w(checkout createStory delete commit)
@@ -31,7 +32,7 @@ when "checkout" # parse delete options
   when "delete"  # parse copy options
     track.deleteBranch(ARGV[0])
   when "commit"  # parse copy options
-    track.new.commit(ARGV[0])
+    track.commit(ARGV[0])
   when "saveClientInfo"
     track.saveClientInfo(ARGV[0])
   else

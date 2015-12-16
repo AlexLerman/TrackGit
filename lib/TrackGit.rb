@@ -1,16 +1,13 @@
 require 'git'
 require 'logger'
 require 'tracker_api'
-require 'trollop'
 require 'json'
-
-
 
 
 
 class TrackGit
 
-  def initialize()
+  def initialize
     @g = Git.open(".", :log => Logger.new(STDOUT))
     if File.exist?("credentials")
       apiToken = JSON.parse(File.read("credentials"))["token"]
@@ -40,6 +37,9 @@ class TrackGit
     if existingStory(story, @project.stories)
       story = convertToValidBranchName(story)
       @g.branch(story).checkout
+    else
+      puts "There is no story by that name"
+      # add option to create story if none exists
     end
   end
 
@@ -48,12 +48,19 @@ class TrackGit
   end
 
   def commit(message)
+    story = project.story(getStoryID())
+    # write comment on story when commited.
+    puts story.comments(fields: ':default,person')
     @g.commit(message)
   end
 
   private
   def convertToValidBranchName(name)
     name.gsub(" ", '_')
+  end
+
+  def convertToStoryName(name)
+    name.gsub("_", ' ').gsub("\n", '')
   end
 
   def existingStory(story, stories)
@@ -64,37 +71,10 @@ class TrackGit
     stories.include? story
   end
 
-
-
-end
-
-track = TrackGit.new
-
-SUB_COMMANDS = %w(checkout createStory delete commit)
-global_opts = Trollop::options do
-  banner "magic file deleting and copying utility"
-  opt :dry_run, "Don't actually do anything", :short => "-n"
-  stop_on SUB_COMMANDS
-end
-
-cmd = ARGV.shift # get the subcommand
-cmd_opts = case cmd
-when "checkout" # parse delete options
-    Trollop::options do
-      opt :test, "test"
-    end
-    track.checkoutStory(ARGV[0])
-  when "createStory"  # parse copy options
-    Trollop::options do
-      opt :test, "test"
-    end
-    track.createStory(ARGV[0])
-  when "delete"  # parse copy options
-    track.deleteBranch(ARGV[0])
-  when "commit"  # parse copy options
-    track.new.commit(ARGV[0])
-  when "saveClientInfo"
-    track.saveClientInfo(ARGV[0])
-  else
-    Trollop::die "unknown subcommand #{cmd.inspect}"
+  def getStoryID
+     id = @project.stories.detect {|story| story["name"] == convertToStoryName(`git rev-parse --abbrev-ref HEAD`) }
+     puts id
+     id
   end
+
+end
