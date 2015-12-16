@@ -2,6 +2,8 @@ require 'git'
 require 'logger'
 require 'tracker_api'
 require 'trollop'
+require 'json'
+
 
 
 
@@ -10,17 +12,35 @@ class TrackGit
 
   def initialize()
     @g = Git.open(".", :log => Logger.new(STDOUT))
-
+    if File.exist?("credentials")
+      apiToken = JSON.parse(File.read("credentials"))["token"]
+      client = TrackerApi::Client.new(token: apiToken)
+      puts client.projects.inspect
+      @project = client.project(1500636)
+                  # Create API client
+    else
+      client = nil
+    end
   end
 
   public
+
+  def saveClientInfo(apiToken)
+    tokenHash = {:token => apiToken}
+    File.write("credentials", JSON.generate(tokenHash))
+  end
+
   def createStory(story)
+    @project.create_story(name: story)
     story = convertToValidBranchName(story)
     @g.branch(story).checkout
   end
 
   def checkoutStory(story)
-    @g.checkout(convertToValidBranchName(story))
+    if existingStory(story, @project.stories)
+      story = convertToValidBranchName(story)
+      @g.branch(story).checkout
+    end
   end
 
   def deleteBranch(branch)
@@ -36,11 +56,19 @@ class TrackGit
     name.gsub(" ", '_')
   end
 
+  def existingStory(story, stories)
+    puts story
+    puts stories
+    stories.map! {|story| story.name}
+    puts stories
+    stories.include? story
+  end
+
 
 
 end
 
-
+track = TrackGit.new
 
 SUB_COMMANDS = %w(checkout createStory delete commit)
 global_opts = Trollop::options do
@@ -55,16 +83,18 @@ when "checkout" # parse delete options
     Trollop::options do
       opt :test, "test"
     end
-    TrackGit.new.checkoutStory(ARGV[0])
+    track.checkoutStory(ARGV[0])
   when "createStory"  # parse copy options
     Trollop::options do
       opt :test, "test"
     end
-    TrackGit.new.createStory(ARGV[0])
+    track.createStory(ARGV[0])
   when "delete"  # parse copy options
-    TrackGit.new.deleteBranch(ARGV[0])
+    track.deleteBranch(ARGV[0])
   when "commit"  # parse copy options
-    TrackGit.new.commit(ARGV[0])
+    track.new.commit(ARGV[0])
+  when "saveClientInfo"
+    track.saveClientInfo(ARGV[0])
   else
     Trollop::die "unknown subcommand #{cmd.inspect}"
   end
