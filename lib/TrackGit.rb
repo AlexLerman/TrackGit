@@ -48,10 +48,20 @@ class TrackGit
   end
 
   def commit(message)
-    story = project.story(getStoryID())
+    story = getStory
     # write comment on story when commited.
     puts story.comments(fields: ':default,person')
     @g.commit(message)
+  end
+
+  def getComments
+    story = getStory()
+    puts story.comments(fields: ':default,person')
+  end
+
+  def addComment
+    story = getStory()
+    story.comments(text: "Hey, I just wrote a comment from the console")
   end
 
   private
@@ -71,10 +81,8 @@ class TrackGit
     stories.include? story
   end
 
-  def getStoryID
-     id = @project.stories.detect {|story| story["name"] == convertToStoryName(`git rev-parse --abbrev-ref HEAD`) }
-     puts id
-     id
+  def getStory
+     story = @project.stories.detect {|story| convertToValidBranchName(story.name) == `git rev-parse --abbrev-ref HEAD`.gsub("\n", '') }
   end
 
 end
