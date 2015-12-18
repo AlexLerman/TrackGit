@@ -1,18 +1,32 @@
 require 'github'
-
+require 'pivotaltracker'
+require 'jira-ruby'
 
 class Track
+  @tracker = config.tracker
   @project = getProject()
   @user = getUser()
 
   public
-  def addIssue
+  def createIssue(name)
+    case @tracker
+    when "github"
+      github.issue.create("name")
+    when "jira"
+    when "pivotaltracker"
+    else
+      puts "Issue tracker not supported yet"
+    end
   end
 
-  def addComment(issue)
+  def addComment(comment)
   end
 
-  def addTask(issue)
+  def addTask(task)
+    #not for github
+  end
+
+  def getIssue(name)
   end
 
   def resolveIssue(issue)
@@ -27,7 +41,10 @@ class Track
   def listComments
   end
 
-  def label
+  def addLabel
+  end
+
+  def listLabels
   end
 
   def updateDescription
@@ -38,7 +55,6 @@ class Track
 
   def listMilestones
   end
-
 
   def signInWithToken(token)
   end

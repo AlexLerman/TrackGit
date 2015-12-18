@@ -2,10 +2,11 @@ require 'git'
 require 'logger'
 require 'tracker_api'
 require 'json'
-
+require_relative "./track"
 
 
 class TrackGit
+  @track = Track.new
 
   def initialize
     @g = Git.open(".", :log => Logger.new(STDOUT))
@@ -27,14 +28,14 @@ class TrackGit
     File.write("credentials", JSON.generate(tokenHash))
   end
 
-  def createStory(story)
-    @project.create_story(name: story)
+  def createIssue(story)
+    track.createIssue(story)
     story = convertToValidBranchName(story)
     @g.branch(story).checkout
   end
 
   def checkoutStory(story)
-    if existingStory(story, @project.stories)
+    if getIssue(story) != nil
       story = convertToValidBranchName(story)
       @g.branch(story).checkout
     else
@@ -48,20 +49,25 @@ class TrackGit
   end
 
   def commit(message)
-    story = getStory
-    # write comment on story when commited.
-    puts story.comments(fields: ':default,person')
     @g.commit(message)
+    commit = @g.gcommit(@g.revparse("HEAD"))
+    @track.addComment(formatComment(commit, message))
+  end
+
+  def add(files)
+    @g.add(files)
   end
 
   def getComments
-    story = getStory()
-    puts story.comments(fields: ':default,person')
+    @track.getComments
   end
 
   def addComment
-    story = getStory()
-    story.comments(text: "Hey, I just wrote a comment from the console")
+    @track.addComment
+  end
+
+  def remove(files)
+    @g.remove(files)
   end
 
   private
@@ -83,6 +89,10 @@ class TrackGit
 
   def getStory
      story = @project.stories.detect {|story| convertToValidBranchName(story.name) == `git rev-parse --abbrev-ref HEAD`.gsub("\n", '') }
+  end
+
+  def formatComment(commit, message)
+    "#{message} \n Commit #{commit.sha} by #{commit.author.name}"
   end
 
 end
