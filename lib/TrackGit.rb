@@ -29,13 +29,13 @@ class TrackGit
   end
 
   def createIssue(story)
-    track.createIssue(story)
+    @track.createIssue(story)
     story = convertToValidBranchName(story)
     @g.branch(story).checkout
   end
 
   def checkoutStory(story)
-    if getIssue(story) != nil
+    if @track.getIssue(story) != nil
       story = convertToValidBranchName(story)
       @g.branch(story).checkout
     else
@@ -52,6 +52,10 @@ class TrackGit
     @g.commit(message)
     commit = @g.gcommit(@g.revparse("HEAD"))
     addComment(formatComment(commit, message))
+  end
+
+  def push(remote = 'origin', branch = getBranchName(), opts = {})
+    @g.push(remote, branch, opts)
   end
 
   def add(files)
