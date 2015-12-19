@@ -51,19 +51,19 @@ class TrackGit
   def commit(message)
     @g.commit(message)
     commit = @g.gcommit(@g.revparse("HEAD"))
-    @track.addComment(formatComment(commit, message))
+    addComment(formatComment(commit, message))
   end
 
   def add(files)
-    @g.add(files)
+    @g.add(files) # "filename" or ["file1", "file2"]
   end
 
   def getComments
     @track.getComments
   end
 
-  def addComment
-    @track.addComment
+  def addComment(comment)
+    @track.addComment(comment)
   end
 
   def remove(files)
@@ -80,10 +80,7 @@ class TrackGit
   end
 
   def existingStory(story, stories)
-    puts story
-    puts stories
     stories.map! {|story| story.name}
-    puts stories
     stories.include? story
   end
 

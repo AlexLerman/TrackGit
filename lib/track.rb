@@ -1,17 +1,19 @@
-require 'github'
 require 'pivotaltracker'
 require 'jira-ruby'
+require 'github'
+
 
 class Track
   @tracker = config.tracker
   @project = getProject()
   @user = getUser()
+  @branch = getBranchName()
 
   public
-  def createIssue(name)
+  def createIssue(title, body = nil, asssignee = nil, milestone = nil, labels = nil)
     case @tracker
     when "github"
-      github.issue.create("name")
+      @project.create_issue( config.repo, title: title, body: body, {:assignee => assignee, milestone: milestone, labels: labels})
     when "jira"
     when "pivotaltracker"
     else
@@ -20,6 +22,7 @@ class Track
   end
 
   def addComment(comment)
+    @project.add_comment(config.repo, getIssue().number,  comment)
   end
 
   def addTask(task)
@@ -27,6 +30,8 @@ class Track
   end
 
   def getIssue(name)
+    issues = @project.issues(config.repo)
+    issues.detect {|i| convertToValidBranchName(i.title) == @branch}
   end
 
   def resolveIssue(issue)
@@ -64,9 +69,20 @@ class Track
 
   private
 
+  def getBranchName
+    `git rev-parse --abbrev-ref HEAD`.gsub("\n", '')
+  end
+
+  def convertToValidBranchName(name)
+    name.gsub(" ", '_')
+  end
+
   def getProject
 
   end
 
+  def currentIssueID
+
+  end
 
 end

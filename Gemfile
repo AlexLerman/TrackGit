@@ -4,3 +4,4 @@ gem 'tracker_api'
 gem 'git'
 gem 'logger'
 gem 'trollop'
+gem "github_api"
