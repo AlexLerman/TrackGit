@@ -10,15 +10,6 @@ class TrackGit
 
   def initialize
     @g = Git.open(".", :log => Logger.new(STDOUT))
-    if File.exist?("credentials")
-      apiToken = JSON.parse(File.read("credentials"))["token"]
-      client = TrackerApi::Client.new(token: apiToken)
-      puts client.projects.inspect
-      @project = client.project(1500636)
-                  # Create API client
-    else
-      client = nil
-    end
   end
 
   public
