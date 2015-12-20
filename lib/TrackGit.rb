@@ -6,26 +6,34 @@ require_relative "./track"
 
 
 class TrackGit
-  @track = Track.new
 
   def initialize
-    @g = Git.open(".", :log => Logger.new(STDOUT))
+    @g = Git.open(".")
+    @track = Track.new
+
   end
 
   public
 
-  def saveClientInfo(apiToken)
-    tokenHash = {:token => apiToken}
-    File.write("credentials", JSON.generate(tokenHash))
+  def login(credentials)
+    @track.signInWithCredentials(*credentials)
   end
 
-  def createIssue(story)
-    @track.createIssue(story)
-    story = convertToValidBranchName(story)
+  def setTracker(tracker)
+    @track.setTracker(tracker)
+  end
+
+  def setRepo(repo)
+    @track.setRepo(repo)
+  end
+
+  def createIssue(details)
+    @track.createIssue(*details)
+    story = convertToValidBranchName(details[0])
     @g.branch(story).checkout
   end
 
-  def checkoutStory(story)
+  def checkoutIssue(story)
     if @track.getIssue(story) != nil
       story = convertToValidBranchName(story)
       @g.branch(story).checkout
@@ -85,6 +93,10 @@ class TrackGit
 
   def formatComment(commit, message)
     "#{message} \n Commit #{commit.sha} by #{commit.author.name}"
+  end
+
+  def getRepo
+    @g.config["remote.origin.url"].gsub(".git", "").gsub("git@github.com:", "")
   end
 
 end

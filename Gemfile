@@ -4,4 +4,6 @@ gem 'tracker_api'
 gem 'git'
 gem 'logger'
 gem 'trollop'
-gem "github_api"
+gem "octokit"
+gem 'configatron'
+gem 'yaml'

@@ -1,19 +1,23 @@
-require 'pivotaltracker'
-require 'jira-ruby'
-require 'github'
-
+# require 'pivotaltracker'
+# require 'jira-ruby'
+require 'octokit'
+require_relative './config'
 
 class Track
-  @tracker = config.tracker
-  @project = getProject()
-  @user = getUser()
-  @branch = getBranchName()
+
+  def initialize
+    @tracker = configatron.tracker()
+    @project = getProject()
+    @branch = getBranchName()
+  end
 
   public
-  def createIssue(title, body = nil, asssignee = nil, milestone = nil, labels = nil)
+  def createIssue(title, body = nil, assignee = nil, milestone = nil, labels = nil)
+
+    puts @tracker
     case @tracker
     when "github"
-      @project.create_issue( config.repo, title: title, body: body, {:assignee => assignee, milestone: milestone, labels: labels})
+      @project.create_issue(configatron.repo, title, body, {:assignee => assignee, :milestone => milestone, :labels => labels})
     when "jira"
     when "pivotaltracker"
     else
@@ -22,15 +26,15 @@ class Track
   end
 
   def addComment(comment)
-    @project.add_comment(config.repo, getIssue().number,  comment)
+    @project.add_comment(configatron.repo, getIssue().number,  comment)
   end
 
   def addTask(task)
     #not for github
   end
 
-  def getIssue(name)
-    issues = @project.issues(config.repo)
+  def getIssue
+    issues = @project.issues(configatron.repo)
     issues.detect {|i| convertToValidBranchName(i.title) == @branch}
   end
 
@@ -64,8 +68,27 @@ class Track
   def signInWithToken(token)
   end
 
-  def signInWithCredentials(user, password)
+  def setTracker(tracker = "github")
+    configatron.tracker = tracker
+    File.write(File.join( __dir__, 'config.yml'), configatron.to_h.to_yaml)
   end
+
+  def signInWithCredentials(user, password)
+    case @tracker
+    when "github"
+      configatron[@tracker].login = user
+      configatron[@tracker].password = password
+      puts configatron.to_h.to_yaml
+      File.write(File.join( __dir__, 'config.yml'), configatron.to_h.to_yaml)
+    end
+  end
+
+
+  def setRepo(repo)
+    configatron.repo = repo
+    File.write(File.join( __dir__, 'config.yml'), configatron.to_h.to_yaml)
+  end
+
 
   private
 
@@ -78,11 +101,18 @@ class Track
   end
 
   def getProject
-
+    case @tracker
+    when "github"
+      Octokit.configure do |c|
+        c.login = configatron[@tracker].login
+        c.password = configatron[@tracker].password
+      end
+      Octokit.client
+    end
   end
 
   def currentIssueID
-
+    getIssue().number
   end
 
 end
