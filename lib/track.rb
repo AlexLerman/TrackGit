@@ -14,7 +14,6 @@ class Track
   public
   def createIssue(title, body = nil, assignee = nil, milestone = nil, labels = nil)
 
-    puts @tracker
     case @tracker
     when "github"
       @project.create_issue(configatron.repo, title, body, {:assignee => assignee, :milestone => milestone, :labels => labels})
@@ -90,7 +89,6 @@ class Track
     when "github"
       configatron[@tracker].login = user
       configatron[@tracker].password = password
-      puts configatron.to_h.to_yaml
       File.write(File.join( __dir__, 'config.yml'), configatron.to_h.to_yaml)
     end
   end
