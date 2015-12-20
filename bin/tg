@@ -10,7 +10,7 @@ require_relative '../lib/TrackGit'
 # puts TrackGit.methods
 track = TrackGit.new
 
-SUB_COMMANDS = %w(checkout createIssue delete commit getComments addComment login setTracker setRepo rebase)
+SUB_COMMANDS = %w(checkout createIssue delete commit getComments addComment login setTracker setRepo merge)
 global_opts = Trollop::options do
   banner "magic file deleting and copying utility"
   opt :dry_run, "Don't actually do anything", :short => "-n"
@@ -43,8 +43,8 @@ when "checkout" # parse delete options
     track.setTracker(ARGV[0])
   when "setRepo"
     track.setRepo(ARGV[0])
-  when "rebase"
-    track.rebase(ARGV[0])
+  when "merge"
+    track.merge(ARGV[0])
   else
     Trollop::die "unknown subcommand #{cmd.inspect}"
   end
