@@ -25,20 +25,32 @@ class Track
     end
   end
 
-  def addComment(comment)
-    @project.add_comment(configatron.repo, getIssue().number,  comment)
+  def addComment(comment, issue_id = getCurrentIssue.number )
+    @project.add_comment(configatron.repo, issue_id,  comment)
   end
 
   def addTask(task)
     #not for github
   end
 
-  def getIssue
+  def getCurrentIssue
     issues = @project.issues(configatron.repo)
     issues.detect {|i| convertToValidBranchName(i.title) == @branch}
   end
 
+  def findIssue(issue)
+    issues = @project.issues(configatron.repo)
+    issues.detect {|i| convertToValidBranchName(i.title) == convertToValidBranchName(issue)}
+  end
+
+  def commentAndClose(branch, comment)
+    addComment(comment, findIssue(branch).number)
+    resolveIssue(branch)
+  end
+
+
   def resolveIssue(issue)
+    @project.close_issue(configatron.repo, findIssue(issue).number, {:assignee => configatron[@tracker].login} )
   end
 
   def listIssues
@@ -89,12 +101,12 @@ class Track
     File.write(File.join( __dir__, 'config.yml'), configatron.to_h.to_yaml)
   end
 
-
-  private
-
   def getBranchName
     `git rev-parse --abbrev-ref HEAD`.gsub("\n", '')
   end
+
+  private
+
 
   def convertToValidBranchName(name)
     name.gsub(" ", '_')

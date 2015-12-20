@@ -34,7 +34,7 @@ class TrackGit
   end
 
   def checkoutIssue(story)
-    if @track.getIssue(story) != nil
+    if @track.findIssue(story) != nil
       story = convertToValidBranchName(story)
       @g.branch(story).checkout
     else
@@ -56,6 +56,16 @@ class TrackGit
   def push(remote = 'origin', branch = getBranchName(), opts = {})
     @g.push(remote, branch, opts)
   end
+
+  def merge(branch)
+    @g.merge(branch)
+    if @track.getBranchName == "master"
+      comment = "Closed by merging to master"
+      @track.commentAndClose(branch, comment)
+    end
+  end
+
+
 
   def add(files)
     @g.add(files) # "filename" or ["file1", "file2"]
