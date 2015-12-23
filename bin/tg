@@ -10,7 +10,16 @@ require_relative '../lib/TrackGit'
 # puts TrackGit.methods
 track = TrackGit.new
 
-SUB_COMMANDS = %w(checkout createIssue delete commit getComments addComment login setTracker setRepo merge)
+all_arguments = ""
+ARGV.each do |arg|
+  if arg.include? " "
+    all_arguments += " \"#{arg}\" "
+  else
+    all_arguments += " #{arg}"
+  end
+end
+
+SUB_COMMANDS = %w(checkout createIssue delete commit getComments addComment login setTracker setRepo merge test)
 global_opts = Trollop::options do
   banner "magic file deleting and copying utility"
   opt :dry_run, "Don't actually do anything", :short => "-n"
@@ -45,6 +54,13 @@ when "checkout" # parse delete options
     track.setRepo(ARGV[0])
   when "merge"
     track.merge(ARGV[0])
+  when "test"
+    opts = Trollop::options do
+      opt :test, "test", :type => :string
+      opt :die, "Do or die", :short => "-d"
+    end
   else
-    Trollop::die "unknown subcommand #{cmd.inspect}"
+    puts "executing as git"
+    puts `git#{all_arguments}`
+    # Trollop::die "unknown subcommand #{cmd.inspect}"
   end
