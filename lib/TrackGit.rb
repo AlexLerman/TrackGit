@@ -1,6 +1,5 @@
 require 'git'
 require 'logger'
-require 'tracker_api'
 require 'json'
 require_relative "./track"
 
