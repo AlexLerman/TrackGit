@@ -7,7 +7,7 @@ require "Trollop"
 # $LOAD_PATH.unshift(lib) if File.directory?(lib) && !$LOAD_PATH.include?(lib)
 
 require_relative '../lib/TrackGit'
-# puts TrackGit.methods
+
 track = TrackGit.new
 
 all_arguments = ""
