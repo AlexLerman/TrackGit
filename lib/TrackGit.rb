@@ -65,7 +65,13 @@ class TrackGit
     end
   end
 
+  def up
+    @g.push("origin", @track.getBranchName)
+  end
 
+  def down
+    @g.pull("origin", @track.getBranchName)
+  end
 
   def add(files)
     @g.add(files) # "filename" or ["file1", "file2"]
