@@ -111,7 +111,7 @@ class TrackGit
   def getWorkingHead
     working_branch = configatron.working_branch.to_s != "configatron.working_branch" ? configatron.working_branch : "master"
     `git fetch origin #{working_branch}`
-    @g.revparse("origin/#{working_branch}")
+    @g.revparse("#{working_branch}")
   end
 
   def convertToValidBranchName(name)
