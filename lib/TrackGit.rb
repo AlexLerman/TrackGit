@@ -106,6 +106,8 @@ class TrackGit
     commits.reverse
   end
 
+  
+
   def getWorkingHead
     working_branch = configatron.working_branch.to_s != "configatron.working_branch" ? configatron.working_branch : "master"
     `git fetch origin #{working_branch}`
