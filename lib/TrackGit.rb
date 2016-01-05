@@ -1,6 +1,7 @@
 require 'git'
 require 'logger'
 require 'json'
+require 'configatron'
 require_relative "./track"
 
 
@@ -46,14 +47,17 @@ class TrackGit
     @g.branch(convertToValidBranchName(branch)).delete
   end
 
-  def commit(message)
-    @g.commit(message)
-    commit = @g.gcommit(@g.revparse("HEAD"))
-    addComment(formatComment(commit, message))
-  end
+  # def commit(message)
+  #   @g.commit(message)
+  #   commit = @g.gcommit(@g.revparse("HEAD"))
+  # end
 
   def push(remote = 'origin', branch = getBranchName(), opts = {})
     @g.push(remote, branch, opts)
+    commits = getCommits()
+    commits.each do |commit|
+      @track.addComment(formatComment(commit.sha, commit.message))
+    end
   end
 
   def merge(branch)
@@ -89,6 +93,24 @@ class TrackGit
   end
 
   private
+
+  def getCommits
+    commits = []
+    working_sha = getWorkingHead()
+    g.log.each do |log|
+      if log.sha != working_sha
+        commits.push(log)
+      end
+    end
+    commits
+  end
+
+  def getWorkingHead
+    working_branch = configatron.working_branch ? configatron.working_branch : "master"
+    `git fetch origin/#{working_branch}`
+    @g.revparse("origin/#{working_branch}")
+  end
+
   def convertToValidBranchName(name)
     name.gsub(" ", '_')
   end
