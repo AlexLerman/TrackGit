@@ -7,3 +7,4 @@ gem 'trollop'
 gem "octokit"
 gem 'configatron'
 gem 'yaml'
+gem 'minitest'

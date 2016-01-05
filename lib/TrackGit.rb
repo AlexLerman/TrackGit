@@ -59,13 +59,22 @@ class TrackGit
     end
   end
 
-  def merge(branch)
-    @g.merge(branch)
+  # def merge(branch)
+  #   @g.merge(branch)
+  #   if @track.getBranchName == "master"
+  #     comment = "Closed by merging to master"
+  #     @track.commentAndClose(branch, comment)
+  #   end
+  # end
+
+  def rebase(branch)
+    @g.rebase(branch)
     if @track.getBranchName == "master"
-      comment = "Closed by merging to master"
+      comment = "Closed by rebasing to master"
       @track.commentAndClose(branch, comment)
     end
   end
+
 
   def up
     @g.push("origin", @track.getBranchName)
