@@ -55,7 +55,7 @@ class TrackGit
     @g.push(remote, branch, opts)
     commits = getCommits()
     commits.each do |commit|
-      @track.addComment(formatComment(commit.sha, commit.message))
+      @track.addComment(formatComment(commit, commit.message))
     end
   end
 
