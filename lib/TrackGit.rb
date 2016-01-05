@@ -1,7 +1,6 @@
 require 'git'
 require 'logger'
 require 'json'
-require 'configatron'
 require_relative "./track"
 
 
@@ -52,7 +51,7 @@ class TrackGit
   #   commit = @g.gcommit(@g.revparse("HEAD"))
   # end
 
-  def push(remote = 'origin', branch = getBranchName(), opts = {})
+  def push(remote = 'origin', branch = @track.getBranchName(), opts = {})
     @g.push(remote, branch, opts)
     commits = getCommits()
     commits.each do |commit|
@@ -106,7 +105,7 @@ class TrackGit
   end
 
   def getWorkingHead
-    working_branch = configatron.working_branch ? configatron.working_branch : "master"
+    working_branch = configatron.working_branch.to_s != "configatron.working_branch" ? configatron.working_branch : "master"
     `git fetch origin/#{working_branch}`
     @g.revparse("origin/#{working_branch}")
   end
