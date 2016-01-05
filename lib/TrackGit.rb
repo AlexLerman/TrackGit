@@ -2,7 +2,7 @@ require 'git'
 require 'logger'
 require 'json'
 require_relative "./track"
-
+require_relative './branch_name'
 
 class TrackGit
 
@@ -106,7 +106,7 @@ class TrackGit
     commits.reverse
   end
 
-  
+
 
   def getWorkingHead
     working_branch = configatron.working_branch.to_s != "configatron.working_branch" ? configatron.working_branch : "master"
@@ -115,7 +115,7 @@ class TrackGit
   end
 
   def convertToValidBranchName(name)
-    name.gsub(" ", '_')
+    BranchName.new(name).to_s
   end
 
   def convertToStoryName(name)
