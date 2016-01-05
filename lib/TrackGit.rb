@@ -96,7 +96,7 @@ class TrackGit
   def getCommits
     commits = []
     working_sha = getWorkingHead()
-    g.log.each do |log|
+    @g.log.each do |log|
       if log.sha != working_sha
         commits.push(log)
       end
@@ -106,7 +106,7 @@ class TrackGit
 
   def getWorkingHead
     working_branch = configatron.working_branch.to_s != "configatron.working_branch" ? configatron.working_branch : "master"
-    `git fetch origin/#{working_branch}`
+    `git fetch origin #{working_branch}`
     @g.revparse("origin/#{working_branch}")
   end
 
