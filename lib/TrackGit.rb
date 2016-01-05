@@ -99,9 +99,11 @@ class TrackGit
     @g.log.each do |log|
       if log.sha != working_sha
         commits.push(log)
+      else
+        break
       end
     end
-    commits
+    commits.reverse
   end
 
   def getWorkingHead
