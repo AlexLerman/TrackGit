@@ -68,11 +68,13 @@ class TrackGit
   # end
 
   def rebase(branch)
-    @g.rebase(branch)
+
     if @track.getBranchName == "master"
       comment = "Closed by rebasing to master"
       @track.commentAndClose(branch, comment)
     end
+    @g.rebase(branch)
+
   end
 
 
