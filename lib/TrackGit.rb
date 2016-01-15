@@ -76,6 +76,10 @@ class TrackGit
     `git rebase #{branch}`
   end
 
+  def listIssues(opts)
+    @track.listIssues(opts)
+  end
+
 
   def up
     @g.push("origin", @track.getBranchName)
