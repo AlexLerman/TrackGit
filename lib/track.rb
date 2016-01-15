@@ -52,7 +52,17 @@ class Track
     @project.close_issue(configatron.repo, findIssue(issue).number, {:assignee => configatron[@tracker].login} )
   end
 
-  def listIssues
+  def listIssues(opts)
+    options = {}
+    options[:assignee] = configatron.github.login if opts.mine
+    options[:state] = "all" if opts.all
+    options[:creator] = opts.creator if opts.creator != nil
+    options[:mentioned] = opts.mentioned if opts.mentioned !=nil
+    options[:milestone] = opts.milestone if opts.milestone !=nil # need to catch when milestone doesn't exist
+    issues = @project.issues(configatron.repo, options)
+    issues.each do |i|
+      puts "#{i.number} #{i.title}"
+    end
   end
 
   def listAssignedIssues
