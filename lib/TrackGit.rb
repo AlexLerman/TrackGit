@@ -73,8 +73,7 @@ class TrackGit
       comment = "Closed by rebasing to master"
       @track.commentAndClose(branch, comment)
     end
-    @g.rebase(branch)
-
+    `git rebase #{branch}`
   end
 
 
