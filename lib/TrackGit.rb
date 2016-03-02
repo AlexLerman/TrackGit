@@ -1,8 +1,10 @@
 require 'git'
 require 'logger'
 require 'json'
+require 'shellwords'
 require_relative "./track"
 require_relative './branch_name'
+require_relative './commit'
 
 class TrackGit
 
@@ -28,17 +30,17 @@ class TrackGit
 
   def createIssue(details)
     issue = @track.createIssue(*details)
-    story = convertToValidBranchName(issue.title, issue.number)
+    story = BranchName.new(issue.title, issue.number).to_branch_name
     @g.branch(story).checkout
   end
 
   def checkoutIssue(story)
     issue = @track.findIssue(story)
     if  issue != nil
-      story = convertToValidBranchName(issue.title,  issue.number)
+      story = BranchName.new(issue.title, issue.number).to_branch_name
       @g.branch(story).checkout
     else
-      puts "There iss no story by that name"
+      puts "There iss no story by zat name"
       # add option to create story if none exists
     end
   end
@@ -62,6 +64,14 @@ class TrackGit
   #   @g.commit(message)
   #   commit = @g.gcommit(@g.revparse("HEAD"))
   # end
+
+
+  def commit(all_arguments)
+    system("git#{all_arguments}")
+    original_message = Commit.from_git_log_item(`git log -1`).message
+    issue_number_tag = "\n[issue #{getCurrentBranchName.split('_')[0]}]"
+    `git commit --amend -m #{Shellwords.escape original_message + issue_number_tag}`
+  end
 
   def push(remote = 'origin', branch = @track.getBranchName(), opts = {})
     @g.push(remote, branch, opts)
@@ -140,10 +150,6 @@ class TrackGit
     @g.revparse("#{working_branch}")
   end
 
-  def convertToValidBranchName(name, number)
-    BranchName.new(name, number).to_branch_name
-  end
-
   def convertToStoryName(name)
     name.gsub("_", ' ').gsub("\n", '')
   end
@@ -151,6 +157,10 @@ class TrackGit
   def existingStory(story, stories)
     stories.map! {|story| story.name}
     stories.include? story
+  end
+
+  def getCurrentBranchName
+    `git rev-parse --abbrev-ref HEAD`
   end
 
   # def getStory
