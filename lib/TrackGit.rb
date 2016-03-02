@@ -68,6 +68,7 @@ class TrackGit
 
   def commit(all_arguments)
     system("git#{all_arguments}")
+    puts "Returned out of system safely"
     original_message = Commit.from_git_log_item(`git log -1`).message
     issue_number_tag = "\n[issue #{getCurrentBranchName.split('_')[0]}]"
     `git commit --amend -m #{Shellwords.escape original_message + issue_number_tag}`
