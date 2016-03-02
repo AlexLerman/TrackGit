@@ -77,8 +77,12 @@ class TrackGit
     @g.push(remote, branch, opts)
     commits = getCommits()
     commits.each do |commit|
-      @track.addComment(formatComment(commit, commit.message))
+      issueId = Commit.new(message).getIssueId
+      @track.addComment(formatComment(commit, commit.message), issueId)
     end
+  end
+
+  def getIssueId(message)
   end
 
   # def merge(branch)

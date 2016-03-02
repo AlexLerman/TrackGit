@@ -10,4 +10,8 @@ class Commit
   def message
     @string.split("\n\n", 2)[1].gsub(/(^|\n)    /, '\1')
   end
+
+  def getIssueId
+    @string.split("\n")[-1][/#\d+/]
+  end
 end
