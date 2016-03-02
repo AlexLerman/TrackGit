@@ -40,8 +40,8 @@ when "checkout" # parse delete options
     track.createIssue(ARGV)
   when "delete"  # parse copy options
     track.deleteBranch(ARGV[0])
-  # when "commit"  # parse copy options
-  #   track.commit(ARGV[0])
+  when "commit"  # parse copy options
+    track.commit(all_arguments)
   when "getComments"
     track.getComments
   when "addComment"
