@@ -75,10 +75,6 @@ class TrackGit
 
   def push(remote = 'origin', branch = @track.getBranchName(), opts = {})
     @g.push(remote, branch, opts)
-    commits = getCommits()
-    commits.each do |commit|
-      @track.addComment(formatComment(commit, commit.message))
-    end
   end
 
   # def merge(branch)
