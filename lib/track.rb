@@ -2,6 +2,7 @@
 # require 'jira-ruby'
 require 'octokit'
 require_relative './config'
+require_relative './branch_name'
 
 class Track
 
@@ -34,12 +35,12 @@ class Track
 
   def getCurrentIssue
     issues = @project.issues(configatron.repo)
-    issues.detect {|i| convertToValidBranchName(i.title) == @branch}
+    issues.detect {|i| BranchName.new(i.title, i.number).to_branch_name == @branch}
   end
 
   def findIssue(issue)
     issues = @project.issues(configatron.repo)
-    issues.detect {|i| convertToValidBranchName(i.title) == convertToValidBranchName(issue)}
+    issues.detect {|i| BranchName.new(i.title, 0).to_s == BranchName.new(issue, 0).to_s}
   end
 
   def commentAndClose(branch, comment)
@@ -114,11 +115,6 @@ class Track
   end
 
   private
-
-
-  def convertToValidBranchName(name)
-    name.gsub(" ", '_')
-  end
 
   def getProject
     case @tracker
