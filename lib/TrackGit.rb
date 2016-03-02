@@ -78,6 +78,7 @@ class TrackGit
     commits = getCommits()
     commits.each do |commit|
       issueId = Commit.new(message).getIssueId
+      puts issueId
       @track.addComment(formatComment(commit, commit.message), issueId)
     end
   end
