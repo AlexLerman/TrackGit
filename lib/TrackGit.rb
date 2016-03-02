@@ -27,23 +27,35 @@ class TrackGit
   end
 
   def createIssue(details)
-    @track.createIssue(*details)
-    story = convertToValidBranchName(details[0])
+    issue = @track.createIssue(*details)
+    story = convertToValidBranchName(issue.title, issue.number)
     @g.branch(story).checkout
   end
 
   def checkoutIssue(story)
-    if @track.findIssue(story) != nil
-      story = convertToValidBranchName(story)
+    issue = @track.findIssue(story)
+    if  issue != nil
+      story = convertToValidBranchName(issue.title,  issue.number)
       @g.branch(story).checkout
     else
-      puts "There is no story by that name"
+      puts "There iss no story by that name"
       # add option to create story if none exists
     end
   end
 
   def deleteBranch(branch)
-    @g.branch(convertToValidBranchName(branch)).delete
+    @g.branch(findBranch(branch)).delete
+  end
+
+  def findBranch(name)
+    branches = @g.branches.map{ |branch| branch.name }
+    branches.detect do |branch|
+      BranchName.new(name, 0).to_s == remove_number(branch)
+    end
+  end
+
+  def remove_number(branch)
+    branch.split('_', 2)[1]
   end
 
   # def commit(message)
@@ -128,8 +140,8 @@ class TrackGit
     @g.revparse("#{working_branch}")
   end
 
-  def convertToValidBranchName(name)
-    BranchName.new(name).to_s
+  def convertToValidBranchName(name, number)
+    BranchName.new(name, number).to_branch_name
   end
 
   def convertToStoryName(name)
@@ -141,9 +153,9 @@ class TrackGit
     stories.include? story
   end
 
-  def getStory
-     story = @project.stories.detect {|story| convertToValidBranchName(story.name) == `git rev-parse --abbrev-ref HEAD`.gsub("\n", '') }
-  end
+  # def getStory
+  #    story = @project.stories.detect {|story| convertToValidBranchName(story.name) == `git rev-parse --abbrev-ref HEAD`.gsub("\n", '') }
+  # end
 
   def formatComment(commit, message)
     "#{message} \n Commit #{commit.sha} by #{commit.author.name}"
