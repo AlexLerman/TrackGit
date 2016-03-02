@@ -28,14 +28,14 @@ class TrackGit
 
   def createIssue(details)
     issue = @track.createIssue(*details)
-    story = convertToValidBranchName(issue.title, issue.number)
+    story = BranchName.new(issue.title, issue.number).to_branch_name
     @g.branch(story).checkout
   end
 
   def checkoutIssue(story)
     issue = @track.findIssue(story)
     if  issue != nil
-      story = convertToValidBranchName(issue.title,  issue.number)
+      story = BranchName.new(issue.title, issue.number).to_branch_name
       @g.branch(story).checkout
     else
       puts "There iss no story by that name"
@@ -138,10 +138,6 @@ class TrackGit
     working_branch = configatron.working_branch.to_s != "configatron.working_branch" ? configatron.working_branch : "master"
     `git fetch origin #{working_branch}`
     @g.revparse("#{working_branch}")
-  end
-
-  def convertToValidBranchName(name, number)
-    BranchName.new(name, number).to_branch_name
   end
 
   def convertToStoryName(name)
