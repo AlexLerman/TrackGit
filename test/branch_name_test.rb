@@ -23,4 +23,11 @@ class BranchNameTest < Minitest::Test
       BranchName.new('')
     end
   end
+
+  def test_accepts_issue_number
+    assert_equal '3_work_dammit!', BranchName.new('work dammit!', 3).to_s
+
+  end
+
+
 end
