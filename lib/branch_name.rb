@@ -12,4 +12,8 @@ class BranchName
   def to_branch_name
     @issue_number.to_s + "_" + to_s
   end
+
+  def to_issue_name
+    @raw_branch_name.split("_", 2)[1]
+  end
 end
