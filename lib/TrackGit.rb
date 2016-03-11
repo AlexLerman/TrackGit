@@ -34,7 +34,14 @@ class TrackGit
     @g.branch(story).checkout
   end
 
-  def checkoutIssue(story)
+  def checkoutIssue(story_or_branch_name)
+    if branch = @g.branch(story_or_branch_name)
+      branch.checkout
+      return
+    end
+
+    story = story_or_branch_name
+
     issue = @track.findIssue(story)
     if  issue != nil
       story = BranchName.new(issue.title, issue.number).to_branch_name
