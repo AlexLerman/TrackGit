@@ -19,7 +19,7 @@ ARGV.each do |arg|
   end
 end
 
-SUB_COMMANDS = %w(checkout createIssue commit delete getComments addComment login setTracker setRepo rebase test up down push listIssues)
+SUB_COMMANDS = %w(checkout createIssue commit delete getComments addComment login setTracker setRepo rebase test up down push create config listIssues)
 global_opts = Trollop::options do
   banner "magic file deleting and copying utility"
   # opt :dry_run, "Don't actually do anything", :short => "-n"
@@ -38,6 +38,11 @@ when "checkout" # parse delete options
       opt :test, "test"
     end
     track.createIssue(ARGV)
+
+  when "create"
+    track.createIssue(ARGV)
+  when "setup"
+    track.setup
   when "delete"  # parse copy options
     track.deleteBranch(ARGV[0])
   when "commit"  # parse copy options
