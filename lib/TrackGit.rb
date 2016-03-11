@@ -5,6 +5,7 @@ require 'shellwords'
 require_relative "./track"
 require_relative './branch_name'
 require_relative './commit'
+require 'io/console'
 
 class TrackGit
 
@@ -22,6 +23,46 @@ class TrackGit
 
   def setTracker(tracker)
     @track.setTracker(tracker)
+  end
+
+  def setup()
+    tracker = prompt("What tracker are you using? ")
+    setTracker(tracker)
+    repo = nil
+    username = prompt("What's your username? ")
+    password = promptPassword("What's your password? ")
+    login([username, password])
+    while !validRepo(repo)
+      repo = prompt("What is your repository? ")
+    end
+    setRepo(repo)
+    prod = prompt("Create production branch? [Y/n] ")
+    if prod == "" or prod[0].downcase == "y"
+      @g.branch("prod").create
+    end
+
+  end
+
+  def prompt(prompt)
+    print prompt
+    gets.chomp
+  end
+
+  def promptPassword(prompt)
+    print prompt
+    password = STDIN.noecho(&:gets).chomp
+    puts
+    password
+  end
+
+  def validRepo(repo)
+    if repo != nil
+      if @track.getRepo(repo) == nil
+        puts "Invalid repository. Use user/repo"
+        return false
+      end
+      return true
+    end
   end
 
   def setRepo(repo)
@@ -104,7 +145,6 @@ class TrackGit
   def listIssues(opts)
     @track.listIssues(opts)
   end
-
 
   def up
     @g.push("origin", @track.getBranchName)

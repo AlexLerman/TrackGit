@@ -112,7 +112,11 @@ class Track
     `git rev-parse --abbrev-ref HEAD`.gsub("\n", '')
   end
 
-  private
+  def getRepo(repo)
+    Octokit.repo repo
+  rescue Octokit::InvalidRepository
+  end
+
 
   def getProject
     case @tracker
@@ -124,6 +128,9 @@ class Track
       Octokit.client
     end
   end
+
+  private
+
 
   def currentIssueID
     getIssue().number
