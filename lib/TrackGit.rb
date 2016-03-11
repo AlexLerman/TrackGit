@@ -142,6 +142,17 @@ class TrackGit
     `git rebase #{branch}`
   end
 
+  def finish
+    #user choses files to add
+    #commit if something is added
+    checkoutIssue("master")
+    rebase(getCurrentBranchName)
+  end
+
+  def changesStaged
+
+  end
+
   def listIssues(opts)
     @track.listIssues(opts)
   end
