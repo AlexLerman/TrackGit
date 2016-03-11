@@ -34,13 +34,11 @@ class Track
   end
 
   def getCurrentIssue
-    issues = @project.issues(configatron.repo)
-    issues.detect {|i| BranchName.new(i.title, i.number).to_branch_name == @branch}
+    findIssue(@branch)
   end
 
-  def findIssue(issue)
-    issues = @project.issues(configatron.repo)
-    issues.detect {|i| BranchName.new(i.title, 0).to_s == BranchName.new(issue, 0).to_s}
+  def findIssue(branch)
+    @project.issue(configatron.repo, BranchName.new(branch, 0).get_issue_number)
   end
 
   def commentAndClose(branch, comment)
@@ -49,8 +47,8 @@ class Track
   end
 
 
-  def resolveIssue(issue)
-    @project.close_issue(configatron.repo, findIssue(issue).number, {:assignee => configatron[@tracker].login} )
+  def resolveIssue(branch)
+    @project.close_issue(configatron.repo, findIssue(branch).number, {:assignee => configatron[@tracker].login} )
   end
 
   def listIssues(opts)
