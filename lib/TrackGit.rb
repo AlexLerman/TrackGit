@@ -148,8 +148,9 @@ class TrackGit
   def finish
     #user choses files to add
     #commit if something is added
+    branch = getCurrentBranchName
     checkoutIssue("master")
-    rebase(getCurrentBranchName)
+    rebase(branch)
   end
 
   def changesStaged

@@ -19,7 +19,7 @@ ARGV.each do |arg|
   end
 end
 
-SUB_COMMANDS = %w(checkout createIssue commit delete getComments addComment login setTracker setRepo rebase test up down push create config listIssues)
+SUB_COMMANDS = %w(checkout createIssue commit delete getComments addComment login setTracker setRepo finish rebase test up down push create config listIssues)
 global_opts = Trollop::options do
   banner "magic file deleting and copying utility"
   # opt :dry_run, "Don't actually do anything", :short => "-n"
@@ -59,6 +59,8 @@ when "checkout" # parse delete options
     track.setRepo(ARGV[0])
   when "rebase"
     track.rebase(ARGV[0])
+  when "finish"
+    track.finish()
   when "listIssues"
     opts = Trollop::options do
       opt :mine, "mine", :short => "-m"
@@ -81,6 +83,6 @@ when "checkout" # parse delete options
     end
   else
     puts "executing as git"
-    puts `git#{all_arguments}`
+    system("git#{all_arguments}")
     # Trollop::die "unknown subcommand #{cmd.inspect}"
   end
