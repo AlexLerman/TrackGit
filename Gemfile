@@ -6,5 +6,5 @@ gem 'logger'
 gem 'trollop'
 gem "octokit"
 gem 'configatron'
-gem 'yaml'
+gem 'yaml' unless RUBY_VERSION.start_with? '2.2.'
 gem 'minitest'
