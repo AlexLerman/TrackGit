@@ -1,13 +1,13 @@
 # require 'pivotaltracker'
 # require 'jira-ruby'
 require 'octokit'
-require_relative './config'
+require_relative './configure'
 require_relative './branch_name'
 
 class Track
 
   def initialize
-    @tracker = configatron.tracker()
+    @tracker = CONFIG.tracker
     @project = getProject()
     @branch = getBranchName()
   end
@@ -17,7 +17,7 @@ class Track
 
     case @tracker
     when "github"
-      @project.create_issue(configatron.repo, title, body, {:assignee => assignee, :milestone => milestone, :labels => labels})
+      @project.create_issue(CONFIG.repo, title, body, {:assignee => assignee, :milestone => milestone, :labels => labels})
     when "jira"
     when "pivotaltracker"
     else
@@ -26,7 +26,7 @@ class Track
   end
 
   def addComment(comment, issue_id = getCurrentIssue.number )
-    @project.add_comment(configatron.repo, issue_id,  comment)
+    @project.add_comment(CONFIG.repo, issue_id,  comment)
   end
 
   def addTask(task)
@@ -38,7 +38,7 @@ class Track
   end
 
   def findIssue(branch)
-    @project.issue(configatron.repo, BranchName.new(branch, 0).get_issue_number)
+    @project.issue(CONFIG.repo, BranchName.new(branch, 0).get_issue_number)
   end
 
   def commentAndClose(branch, comment)
@@ -48,17 +48,17 @@ class Track
 
 
   def resolveIssue(branch)
-    @project.close_issue(configatron.repo, findIssue(branch).number, {:assignee => configatron[@tracker].login} )
+    @project.close_issue(CONFIG.repo, findIssue(branch).number, {:assignee => CONFIG[@tracker].login} )
   end
 
   def listIssues(opts)
     options = {}
-    options[:assignee] = configatron.github.login if opts.mine
+    options[:assignee] = CONFIG[@tracker].login if opts.mine
     options[:state] = "all" if opts.all
     options[:creator] = opts.creator if opts.creator != nil
     options[:mentioned] = opts.mentioned if opts.mentioned !=nil
     options[:milestone] = opts.milestone if opts.milestone !=nil # need to catch when milestone doesn't exist
-    issues = @project.issues(configatron.repo, options)
+    issues = @project.issues(CONFIG.repo, options)
     issues.each do |i|
       puts "#{i.number} #{i.title}"
     end
@@ -89,23 +89,20 @@ class Track
   end
 
   def setTracker(tracker = "github")
-    configatron.tracker = tracker
-    File.write(File.join( __dir__, 'config.yml'), configatron.to_h.to_yaml)
+    CONFIG.tracker = tracker
   end
 
   def signInWithCredentials(user, password)
     case @tracker
     when "github"
-      configatron[@tracker].login = user
-      configatron[@tracker].password = password
-      File.write(File.join( __dir__, 'config.yml'), configatron.to_h.to_yaml)
+      CONFIG.login = user
+      CONFIG.password = password
     end
   end
 
 
   def setRepo(repo)
-    configatron.repo = repo
-    File.write(File.join( __dir__, 'config.yml'), configatron.to_h.to_yaml)
+    CONFIG.repo = repo
   end
 
   def getBranchName
@@ -122,8 +119,8 @@ class Track
     case @tracker
     when "github"
       Octokit.configure do |c|
-        c.login = configatron[@tracker].login
-        c.password = configatron[@tracker].password
+        c.login = CONFIG.login
+        c.password = CONFIG.password
       end
       Octokit.client
     end
