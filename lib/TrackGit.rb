@@ -97,13 +97,13 @@ class TrackGit
   end
 
   def deleteBranch(branch)
-    @g.branch(findBranch(branch)).delete
+    findBranch(branch).delete
   end
 
   def findBranch(name)
-    branches = @g.branches.map{ |branch| branch.name }
+    branches = @g.branches
     branches.detect do |branch|
-      BranchName.new(name, 0).to_s == remove_number(branch)
+      BranchName.new(name, 0).to_s == remove_number(branch.name)
     end
   end
 
