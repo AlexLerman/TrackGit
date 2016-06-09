@@ -14,4 +14,5 @@ class Commit
   def getIssueId
     @string.split("\n")[-1][/#\d+/]
   end
+
 end

@@ -76,15 +76,18 @@ class TrackGit
   end
 
   def checkoutIssue(story_or_branch_name)
-    if branch = @g.branch(story_or_branch_name)
+    puts "checkoutIssue"
+    if branch = findBranch(story_or_branch_name)
+      puts "inside if; branch = #{branch.inspect}"
       branch.checkout
       return
     end
-
+    puts "got here...."
     story = story_or_branch_name
 
     issue = @track.findIssue(story)
     if  issue != nil
+      puts "found the issue"
       story = BranchName.new(issue.title, issue.number).to_branch_name
       @g.branch(story).checkout
     else
@@ -94,13 +97,13 @@ class TrackGit
   end
 
   def deleteBranch(branch)
-    @g.branch(findBranch(branch)).delete
+    findBranch(branch).delete
   end
 
   def findBranch(name)
-    branches = @g.branches.map{ |branch| branch.name }
+    branches = @g.branches
     branches.detect do |branch|
-      BranchName.new(name, 0).to_s == remove_number(branch)
+      BranchName.new(name, 0).to_s == remove_number(branch.name)
     end
   end
 
@@ -138,7 +141,7 @@ class TrackGit
 
   def rebase(branch)
 
-    if @track.getBranchName == "master"
+    if @track.getBranchName == "master" 
       comment = "Closed by rebasing to master"
       @track.commentAndClose(branch, comment)
     end

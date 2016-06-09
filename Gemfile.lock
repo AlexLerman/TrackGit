@@ -22,6 +22,7 @@ GEM
     git (1.2.9.1)
     ice_nine (0.11.1)
     logger (1.2.8)
+    minitest (5.8.4)
     multipart-post (2.0.0)
     octokit (4.2.0)
       sawyer (~> 0.6.0, >= 0.5.3)
@@ -49,7 +50,6 @@ GEM
       coercible (~> 1.0)
       descendants_tracker (~> 0.0, >= 0.0.3)
       equalizer (~> 0.0, >= 0.0.9)
-    yaml (4.2.2)
 
 PLATFORMS
   ruby
@@ -58,10 +58,7 @@ DEPENDENCIES
   configatron
   git
   logger
+  minitest
   octokit
   tracker_api
   trollop
-  yaml
-
-BUNDLED WITH
-   1.10.0

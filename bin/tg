@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'pathname'
-require "Trollop"
+require "trollop"
 
 # lib = (Pathname.new(__FILE__).realpath.dirname  + '../lib').to_s
 # $LOAD_PATH.unshift(lib) if File.directory?(lib) && !$LOAD_PATH.include?(lib)
@@ -20,6 +20,7 @@ ARGV.each do |arg|
 end
 
 SUB_COMMANDS = %w(checkout createIssue commit delete getComments addComment login setTracker setRepo finish rebase test up down push create config listIssues)
+
 global_opts = Trollop::options do
   banner "magic file deleting and copying utility"
   # opt :dry_run, "Don't actually do anything", :short => "-n"
