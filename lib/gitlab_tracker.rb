@@ -34,7 +34,7 @@ class GitlabTracker < Track
 
 
 
-  def addComment(comment, issue_id = getCurrentIssue.number )
+  def addComment(comment, issue_id = BranchName.new(getCurrentBranchName, 0).get_issue_number )
     @client.create_issue_note(CONFIG.repo, issue_id,  comment)
   end
 
