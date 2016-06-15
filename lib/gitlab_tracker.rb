@@ -18,8 +18,8 @@ class GitlabTracker < Track
   public
 
   def commit()
-    message = Commit.from_git_log_item(`git log -1`).message
-    addComment(message)
+    original_message = Commit.from_git_log_item(`git log -1`).message
+    addComment(original_message)
   end
 
   def genericIssue(issue)
