@@ -48,7 +48,7 @@ class Track
 
 
   def resolveIssue(branch)
-    @project.close_issue(CONFIG.repo, findIssue(branch).number, {:assignee => CONFIG[@tracker].login} )
+    @project.close_issue(CONFIG.repo, findIssue(branch).number, {:assignee => CONFIG.login} )
   end
 
   def listIssues(opts)
