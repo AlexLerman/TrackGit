@@ -76,6 +76,11 @@ class TrackGit
   end
 
   def checkoutIssue(story_or_branch_name)
+    if story_or_branch_name == "master" || story_or_branch_name == "prod"
+      @g.branch(story_or_branch_name).checkout
+      return
+    end
+
     puts "checkoutIssue"
     if branch = findBranch(story_or_branch_name)
       puts "inside if; branch = #{branch.inspect}"
@@ -131,17 +136,17 @@ class TrackGit
   def getIssueId(message)
   end
 
-  # def merge(branch)
-  #   @g.merge(branch)
-  #   if @track.getBranchName == "master"
-  #     comment = "Closed by merging to master"
-  #     @track.commentAndClose(branch, comment)
-  #   end
-  # end
+  def merge(branch)
+    if @track.getBranchName == "master"
+      comment = "Closed by merging to master"
+      @track.commentAndClose(branch, comment)
+    end
+    `git merge #{branch}`
+  end
 
   def rebase(branch)
 
-    if @track.getBranchName == "master" 
+    if @track.getBranchName == "master"
       comment = "Closed by rebasing to master"
       @track.commentAndClose(branch, comment)
     end
@@ -153,7 +158,7 @@ class TrackGit
     #commit if something is added
     branch = getCurrentBranchName
     checkoutIssue("master")
-    rebase(branch)
+    merge(branch)
   end
 
   def changesStaged
