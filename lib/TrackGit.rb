@@ -154,11 +154,11 @@ class TrackGit
   end
 
   def finish
-    #user choses files to add
-    #commit if something is added
+    up()
     branch = getCurrentBranchName
     checkoutIssue("master")
     merge(branch)
+    up()
   end
 
   def changesStaged
