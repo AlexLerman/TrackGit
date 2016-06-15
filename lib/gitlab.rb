@@ -1,6 +1,6 @@
 # require 'pivotaltracker'
 # require 'jira-ruby'
-require 'octokit'
+require 'gitlab'
 require 'shellwords'
 require_relative './commit'
 require_relative './track'
@@ -11,7 +11,8 @@ class Github < Track
 
   def initialize
     @tracker = CONFIG.tracker
-    @project = getProject()
+    @client = Gitlab.client(endpoint: CONFIG.endpoint, private_token: CONFIG.private_token)
+
   end
 
   public
@@ -23,33 +24,28 @@ class Github < Track
   end
 
   def createIssue(title, body = nil, assignee = nil, milestone = nil, labels = nil)
-    @project.create_issue(CONFIG.repo, title, body, {:assignee => assignee, :milestone => milestone, :labels => labels})
+    @client.create_issue(CONFIG.repo, title, {:description => body, :assignee_id => assignee, :milestone_id => milestone, :labels => labels})
   end
 
   def addComment(comment, issue_id = getCurrentIssue.number )
-    @project.add_comment(CONFIG.repo, issue_id,  comment)
+    @client.create_issue_note(CONFIG.repo, issue_id,  comment)
   end
 
   def addTask(task)
-    puts "github does not support tasks"
+    puts "gitlab does not support tasks"
   end
 
   def findIssue(branch)
-    @project.issue(CONFIG.repo, BranchName.new(branch, 0).get_issue_number)
+    @client.issue(CONFIG.repo, BranchName.new(branch, 0).get_issue_number)
   end
 
   def resolveIssue(branch)
-    @project.close_issue(CONFIG.repo, BranchName.new(branch, 0).get_issue_number, {:assignee => CONFIG.login} )
+    @client.edit_issue(CONFIG.repo, BranchName.new(branch, 0).get_issue_number, :assignee_id => CONFIG.login)
+    @client.close_issue(CONFIG.repo, BranchName.new(branch, 0).get_issue_number)
   end
 
   def listIssues(opts)
-    options = {}
-    options[:assignee] = CONFIG.login if opts.mine
-    options[:state] = "all" if opts.all
-    options[:creator] = opts.creator if opts.creator != nil
-    options[:mentioned] = opts.mentioned if opts.mentioned !=nil
-    options[:milestone] = opts.milestone if opts.milestone !=nil # need to catch when milestone doesn't exist
-    issues = @project.issues(CONFIG.repo, options)
+    issues = @client.issues(CONFIG.repo)
     issues.each do |i|
       puts "#{i.number} #{i.title}"
     end
@@ -80,26 +76,23 @@ class Github < Track
   end
 
 
-  def signInWithCredentials(user, password)
+  def signInWithCredentials(user, private_token, endpoint)
     CONFIG.login = user
-    CONFIG.password = password
+    CONFIG.private_token = private_token
+    CONFIG.endpoint = endpoint
   end
 
+  def setRepo(repo)
+    CONFIG.reponame = repo
+    CONFIG.repo = @client.project(repo).id
+
+  end
 
   def getRepo(repo)
     Octokit.repo repo
   rescue Octokit::InvalidRepository
   end
 
-
-  def getProject
-    Octokit.configure do |c|
-      c.login = CONFIG.login
-      c.password = CONFIG.password
-    end
-    Octokit.client
-
-  end
 
 
 
