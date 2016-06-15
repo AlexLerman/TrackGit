@@ -2,7 +2,8 @@ require 'git'
 require 'logger'
 require 'json'
 require 'shellwords'
-require_relative "./github"
+require_relative "./github_tracker"
+require_relative "./gitlab_tracker"
 require_relative './branch_name'
 require_relative './commit'
 require 'io/console'
@@ -13,7 +14,7 @@ class TrackGit
   def initialize
     @g = Git.open(".")
     @track = setTracker(CONFIG.tracker)
-    @supported = [ "github"]
+    @supported = [ "github", "gitlab"]
   end
 
   public
@@ -26,9 +27,9 @@ class TrackGit
     CONFIG.tracker = tracker
     case tracker
     when "github"
-      Github.new
-    # when "gitlab"
-    #   Gitlab.new
+      GithubTracker.new
+    when "gitlab"
+      GitlabTracker.new
     end
   end
 
@@ -39,6 +40,20 @@ class TrackGit
       tracker = prompt("What tracker are you using? ")
     end
     @track = setTracker(tracker)
+    case tracker
+    when "github"
+      githubSetup()
+    when "gitlab"
+      gitlabSetup()
+    end
+    prod = prompt("Create production branch? [Y/n] ")
+    if prod == "" or prod[0].downcase == "y"
+      @g.branch("prod").create
+    end
+
+  end
+
+  def githubSetup()
     repo = nil
     username = prompt("What's your username? ")
     password = promptPassword("What's your password? ")
@@ -47,12 +62,25 @@ class TrackGit
       repo = prompt("What is your repository? ")
     end
     setRepo(repo)
-    prod = prompt("Create production branch? [Y/n] ")
-    if prod == "" or prod[0].downcase == "y"
-      @g.branch("prod").create
-    end
-
   end
+
+
+  def gitlabSetup()
+    repo = nil
+    CONFIG.endpoint = 'https://gitlab.com/api/v3'
+    endpoint= prompt("What's your endpoint (default = 'https://gitlab.com/api/v3')? ")
+    CONFIG.endpoint = endpoint if endpoint != ""
+    token= prompt("What's your private_token? ")
+    @track.signInWithToken(token)
+    username = prompt("What's your username? ")
+    @track.setUser(username)
+    while !validRepo(repo)
+      repo = prompt("What is your repository? ")
+      repo.gsub!("/", "%2F")
+    end
+    setRepo(repo)
+  end
+
 
   def prompt(prompt)
     print prompt
@@ -249,10 +277,10 @@ class TrackGit
   def formatComment(commit, message)
     "#{message} \n Commit #{commit.sha} by #{commit.author.name}"
   end
-
-  def getRepo
-    @g.config["remote.origin.url"].gsub(".git", "").gsub("git@github.com:", "")
-  end
+  #
+  # def getRepo
+  #   @g.config["remote.origin.url"].gsub(".git", "").gsub("git@github.com:", "")
+  # end
 
   #testing commit
   #test again
