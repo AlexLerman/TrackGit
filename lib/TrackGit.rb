@@ -2,17 +2,18 @@ require 'git'
 require 'logger'
 require 'json'
 require 'shellwords'
-require_relative "./track"
+require_relative "./github"
 require_relative './branch_name'
 require_relative './commit'
 require 'io/console'
+
 
 class TrackGit
 
   def initialize
     @g = Git.open(".")
-    @track = Track.new
-
+    @track = setTracker(CONFIG.tracker)
+    @supported = [ "github"]
   end
 
   public
@@ -22,12 +23,22 @@ class TrackGit
   end
 
   def setTracker(tracker)
-    @track.setTracker(tracker)
+    CONFIG.tracker = tracker
+    case tracker
+    when "github"
+      Github.new
+    # when "gitlab"
+    #   Gitlab.new
+    end
   end
 
   def setup()
     tracker = prompt("What tracker are you using? ")
-    setTracker(tracker)
+    until @supported.include?(tracker)
+      puts "Tracker not supported, sorry. "
+      tracker = prompt("What tracker are you using? ")
+    end
+    @track = setTracker(tracker)
     repo = nil
     username = prompt("What's your username? ")
     password = promptPassword("What's your password? ")
@@ -121,13 +132,11 @@ class TrackGit
   #   commit = @g.gcommit(@g.revparse("HEAD"))
   # end
 
-
   def commit(all_arguments)
     system("git#{all_arguments}")
-    original_message = Commit.from_git_log_item(`git log -1`).message
-    issue_number_tag = "\n##{getCurrentBranchName.split('_')[0]}"
-    `git commit --amend -m #{Shellwords.escape original_message + issue_number_tag}`
+    @track.commit()
   end
+
 
   def push(remote = 'origin', branch = @track.getBranchName(), opts = {})
     @g.push(remote, branch, opts)
