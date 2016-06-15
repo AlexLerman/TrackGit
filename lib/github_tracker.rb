@@ -7,7 +7,7 @@ require_relative './track'
 require_relative './configure'
 require_relative './branch_name'
 
-class Github < Track
+class GithubTracker < Track
 
   def initialize
     @tracker = CONFIG.tracker
@@ -39,7 +39,7 @@ class Github < Track
   end
 
   def resolveIssue(branch)
-    @project.close_issue(CONFIG.repo, findIssue(branch).number, {:assignee => CONFIG.login} )
+    @project.close_issue(CONFIG.repo, BranchName.new(branch, 0).get_issue_number, {:assignee => CONFIG.login} )
   end
 
   def listIssues(opts)

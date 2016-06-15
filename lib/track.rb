@@ -13,7 +13,7 @@ class Track
   public
 
   def getCurrentIssue
-    findIssue(@branch)
+    findIssue(getCurrentBranchName())
   end
 
   def commentAndClose(branch, comment)
