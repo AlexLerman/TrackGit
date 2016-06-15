@@ -138,7 +138,7 @@ class TrackGit
   end
 
 
-  def push(remote = 'origin', branch = @track.getBranchName(), opts = {})
+  def push(remote = 'origin', branch = @track.getCurrentBranchName(), opts = {})
     @g.push(remote, branch, opts)
   end
 
@@ -146,7 +146,7 @@ class TrackGit
   end
 
   def merge(branch)
-    if @track.getBranchName == "master"
+    if @track.getCurrentBranchName == "master"
       comment = "Closed by merging to master"
       @track.commentAndClose(branch, comment)
     end
@@ -155,7 +155,7 @@ class TrackGit
 
   def rebase(branch)
 
-    if @track.getBranchName == "master"
+    if @track.getCurrentBranchName == "master"
       comment = "Closed by rebasing to master"
       @track.commentAndClose(branch, comment)
     end
@@ -183,11 +183,11 @@ class TrackGit
   end
 
   def up
-    @g.push("origin", @track.getBranchName)
+    @g.push("origin", @track.getCurrentBranchName)
   end
 
   def down
-    @g.pull("origin", @track.getBranchName)
+    @g.pull("origin", @track.getCurrentBranchName)
   end
 
   def add(files)
