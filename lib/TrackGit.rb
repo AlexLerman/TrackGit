@@ -154,14 +154,14 @@ class TrackGit
   end
 
   def finish
-    if (system 'git diff --exit-code')
+    if (system 'git diff --exit-code') #checks for uncommited changes
       up()
       branch = getCurrentBranchName
       checkoutIssue("master")
       merge(branch)
       up()
     else
-      puts "Uncommited changes. Stash or commit!"
+      puts "\n\nUncommited changes. Stash or commit!"
     end
   end
 
