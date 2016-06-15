@@ -154,11 +154,15 @@ class TrackGit
   end
 
   def finish
-    up()
-    branch = getCurrentBranchName
-    checkoutIssue("master")
-    merge(branch)
-    up()
+    if (system 'git diff --exit-code')
+      up()
+      branch = getCurrentBranchName
+      checkoutIssue("master")
+      merge(branch)
+      up()
+    else
+      puts "Uncommited changes. Stash or commit!"
+    end
   end
 
   def changesStaged
