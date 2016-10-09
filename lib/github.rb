@@ -42,6 +42,10 @@ class Github < Track
     @project.close_issue(CONFIG.repo, findIssue(branch).number, {:assignee => CONFIG.login} )
   end
 
+  def resolveIssueNumber(issue_number)
+    @project.close_issue(CONFIG.repo, issue_number, {:assignee => CONFIG.login} )
+  end
+
   def listIssues(opts)
     options = {}
     options[:assignee] = CONFIG.login if opts.mine

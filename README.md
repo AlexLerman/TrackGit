@@ -5,7 +5,8 @@ TrackGit is a ruby gem project that overlays your git commands to interface dire
 It provides a simple replacement for all git commands, defaulting to git when nothing different needs to happen.
 
 ```bash
-tg createIssue "New Issue" # creates new issue and checks out a branch with the same name
+tg createIssue "New Issue" # creates new issue
+tg createIssue "New Issue" -b # creates new issue and checks out a branch with the same name
 
 tg checkout 15 # checkout issue number 15
 
@@ -17,6 +18,8 @@ tg commit # automatically comments on issue being commited to. If using github i
 tg push || tg up # pushes changes to current branch.  
 
 tg pull || tg down # pulls changes to current branch.  
+
+tg closeIssue 15 -c "Issue resolved itself" # closes issue with optional comment
 
 tg finish # pushes commited changes, merges branch to master.
 ```

@@ -19,7 +19,7 @@ ARGV.each do |arg|
   end
 end
 
-SUB_COMMANDS = %w(checkout createIssue commit delete getComments addComment login setTracker setRepo finish test up down push pull create config listIssues)
+SUB_COMMANDS = %w(checkout createIssue commit delete getComments addComment login setTracker setRepo finish test up down push pull create config listIssues closeIssue)
 
 global_opts = Trollop::options do
   banner "magic file deleting and copying utility"
@@ -35,10 +35,10 @@ when "checkout" # parse delete options
     end
     track.checkoutIssue(ARGV[0])
   when "createIssue"  # parse copy options
-    Trollop::options do
-      opt :test, "test"
+    opts = Trollop::options do
+      opt :mine, "branch", :short => "-b"
     end
-    track.createIssue(ARGV)
+    track.createIssue(ARGV, opts)
 
   when "create"
     track.createIssue(ARGV)
@@ -69,6 +69,11 @@ when "checkout" # parse delete options
       opt :milestone, "milestone", :type => :integer
     end
     track.listIssues(opts)
+  when "closeIssue"
+    opts = Trollop::options do
+      opt :comment, "comment", :short=> "-c", :type => :string
+    end
+    track.closeIssue(ARGV[0], opts.comment)
   when "up"
     track.up
   when "down"
@@ -82,6 +87,7 @@ when "checkout" # parse delete options
       opt :test, "test", :type => :string
       opt :die, "Do or die", :short => "-d"
     end
+    print opts
   else
     puts "executing as git"
     system("git#{all_arguments}")

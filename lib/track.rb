@@ -16,11 +16,15 @@ class Track
     findIssue(@branch)
   end
 
-  def commentAndClose(branch, comment)
+  def commentAndCloseBranch(branch, comment)
     addComment(comment, findIssue(branch).number)
     resolveIssue(branch)
   end
 
+  def commentAndCloseIssue(issue_number, comment)
+    addComment(comment, issue_number)
+    resolveIssueNumber(issue_number)
+  end
 
   def setTracker(tracker = "github")
     CONFIG.tracker = tracker

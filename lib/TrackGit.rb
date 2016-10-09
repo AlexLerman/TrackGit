@@ -80,10 +80,12 @@ class TrackGit
     @track.setRepo(repo)
   end
 
-  def createIssue(details)
+  def createIssue(details, opts)
     issue = @track.createIssue(*details)
-    story = BranchName.new(issue.title, issue.number).to_branch_name
-    @g.branch(story).checkout
+    if opts.branch
+      story = BranchName.new(issue.title, issue.number).to_branch_name
+      @g.branch(story).checkout
+    end
   end
 
   def checkoutIssue(story_or_branch_name)
@@ -107,7 +109,7 @@ class TrackGit
       story = BranchName.new(issue.title, issue.number).to_branch_name
       @g.branch(story).checkout
     else
-      puts "There iss no story by zat name"
+      puts "There iss no issue by zat name"
       # add option to create story if none exists
     end
   end
@@ -145,10 +147,21 @@ class TrackGit
   def getIssueId(message)
   end
 
+  def closeIssue(story, comment)
+    issue = @track.findIssue(story)
+    if issue != nil
+      if comment != nil
+        @track.commentAndCloseIssue(issue.number, comment)
+      else
+        @track.resolveIssue(issue.number)
+      end
+    end
+  end
+
   def merge(branch)
     if @track.getCurrentBranchName == "master"
       comment = "Closed by merging to master"
-      @track.commentAndClose(branch, comment)
+      @track.commentAndCloseBranch(branch, comment)
     end
     `git merge #{branch}`
   end
@@ -157,7 +170,7 @@ class TrackGit
 
     if @track.getCurrentBranchName == "master"
       comment = "Closed by rebasing to master"
-      @track.commentAndClose(branch, comment)
+      @track.commentAndCloseBranch(branch, comment)
     end
     `git rebase #{branch}`
   end
@@ -193,7 +206,7 @@ class TrackGit
   def pull
     @g.pull("origin", @track.getCurrentBranchName)#print success message
   end
-  
+
   def add(files)
     @g.add(files) # "filename" or ["file1", "file2"]
   end
