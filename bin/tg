@@ -36,7 +36,7 @@ when "checkout" # parse delete options
     track.checkoutIssue(ARGV[0])
   when "createIssue"  # parse copy options
     opts = Trollop::options do
-      opt :mine, "branch", :short => "-b"
+      opt :branch, "branch", :short => "-b"
     end
     track.createIssue(ARGV, opts)
 
@@ -66,7 +66,7 @@ when "checkout" # parse delete options
       opt :all, "all", :short => "-a"
       opt :creator, "creator", :short => "-c", :type => :string
       opt :mentioned, "mentioned", :type => :string
-      opt :milestone, "milestone", :type => :integer
+      opt :milestone, "milestone", :type => :string
     end
     track.listIssues(opts)
   when "closeIssue"
