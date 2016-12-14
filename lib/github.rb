@@ -27,11 +27,11 @@ class Github < Track
     @project.create_issue(CONFIG.repo, title, body, {:assignee => assignee, :milestone => milestone, :labels => labels})
   end
 
-  def addComment(comment, issue_id = BranchName.new(@branch, 0).get_issue_number)
+  def addComment(comment, issue_id = currentIssueID)
     @project.add_comment(CONFIG.repo, issue_id,  comment)
   end
 
-  def getComments(issue_id = BranchName.new(@branch, 0).get_issue_number)
+  def getComments(issue_id = currentIssueID)
     arr = @project.issue_comments(CONFIG.repo, issue_id, options = {})
     arr.each do |c|
       puts c.user.login + " says:"

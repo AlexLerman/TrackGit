@@ -140,22 +140,11 @@ class TrackGit
     @track.commit()
   end
 
-
-  def push(remote = 'origin', branch = @track.getCurrentBranchName(), opts = {})
-    @g.push(remote, branch, opts)
-  end
-
-  def getIssueId(message)
-  end
-
-  def closeIssue(story, comment)
-    issue = @track.findIssue(story)
-    if issue != nil
-      if comment != nil
-        @track.commentAndCloseIssue(issue.number, comment)
-      else
-        @track.resolveIssue(issue.number)
-      end
+  def closeIssue(issue_id, comment)
+    if comment != nil
+      @track.commentAndCloseIssue(issue_id, comment)
+    else
+      @track.resolveIssueNumber(issue_id)
     end
   end
 
@@ -197,6 +186,10 @@ class TrackGit
     @track.listIssues(opts)
   end
 
+  def push(remote = 'origin', branch = @track.getCurrentBranchName(), opts = {})
+    @g.push(remote, branch, opts)
+  end
+
   def up
     @g.push("origin", @track.getCurrentBranchName) #print success message
   end
@@ -218,14 +211,17 @@ class TrackGit
   end
 
   def addComment(comment)
-    puts "adding comment"
     @track.addComment(comment)
+    puts "Comment added."
   end
 
   def remove(files)
     @g.remove(files)
   end
 
+  def getIssueId(message)
+  end
+  
   private
 
   def getCommits

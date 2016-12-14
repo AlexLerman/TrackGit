@@ -40,7 +40,7 @@ class Track
   end
 
   def currentIssueID
-    getIssue().number
+    BranchName.new(@branch, 0).get_issue_number
   end
 
 end
