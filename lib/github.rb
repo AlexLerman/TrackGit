@@ -12,6 +12,7 @@ class Github < Track
   def initialize
     @tracker = CONFIG.tracker
     @project = getProject()
+    @branch = getCurrentBranchName()
   end
 
   public
@@ -26,8 +27,16 @@ class Github < Track
     @project.create_issue(CONFIG.repo, title, body, {:assignee => assignee, :milestone => milestone, :labels => labels})
   end
 
-  def addComment(comment, issue_id = getCurrentIssue.number )
+  def addComment(comment, issue_id = BranchName.new(@branch, 0).get_issue_number)
     @project.add_comment(CONFIG.repo, issue_id,  comment)
+  end
+
+  def getComments(issue_id = BranchName.new(@branch, 0).get_issue_number)
+    arr = @project.issue_comments(CONFIG.repo, issue_id, options = {})
+    arr.each do |c|
+      puts c.user.login + " says:"
+      puts "   " + c.body + "\n\n"
+    end
   end
 
   def addTask(task)

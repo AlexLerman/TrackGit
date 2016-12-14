@@ -22,8 +22,43 @@ end
 SUB_COMMANDS = %w(checkout createIssue commit delete getComments addComment login setTracker setRepo finish test up down push pull create config listIssues closeIssue)
 
 global_opts = Trollop::options do
-  banner "magic file deleting and copying utility"
-  # opt :dry_run, "Don't actually do anything", :short => "-n"
+  banner <<-EOS
+TrackGit integretes your issue tracker of choice with your git repo for easy commandline usage.
+Usage:
+       tg [commands] [options] <issues>+
+
+To start using TrackGit:
+      setup                   Sets repository and user info
+      setRepo                 Change repository
+      setTracker              Change tracker
+      login [username] [pass] Update login credentials
+
+Tracker functions:
+      listIssues              Lists all open issues. Can be filtered by:
+                              --mine | -m
+                              --creator | -c
+                              --milestone
+                              --mentioned
+      closeIssue [issue]      Close designated issue
+                              --comment | -c Close with comment
+      getComments             Gets all comments on current issue. Impractical for long chains
+      addComment [comment]    Adds comment to current branch.
+
+Integrated functions:
+      createIssue [title]     Create an issue.
+                              --branch | -b option for creating the branch as well
+      checkout [Issue number] Checkout branch by issue number
+      commit                  Adds issue number to commit message. See `git help commit` for more detail
+      finish                  Merges current branch onto master, closes associated issue and pushes.
+
+Convenience functions:
+      up                      push equivalent
+      down                    pull equivalent
+
+All other git commands are executed as git commands.
+
+EOS
+
   stop_on SUB_COMMANDS
 end
 

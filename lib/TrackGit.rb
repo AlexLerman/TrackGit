@@ -183,6 +183,7 @@ class TrackGit
       checkoutIssue("master")
       merge(branch)
       up()
+      puts "\n\nBranch merged. Local master pushed to master\n"
     else
       puts "\n\nUncommited changes. Stash or commit!"
     end
@@ -217,6 +218,7 @@ class TrackGit
   end
 
   def addComment(comment)
+    puts "adding comment"
     @track.addComment(comment)
   end
 
