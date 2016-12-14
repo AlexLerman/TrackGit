@@ -39,9 +39,11 @@ when "checkout" # parse delete options
       opt :branch, "branch", :short => "-b"
     end
     track.createIssue(ARGV, opts)
-
   when "create"
-    track.createIssue(ARGV)
+    opts = Trollop::options do
+      opt :branch, "branch", :short => "-b"
+    end
+    track.createIssue(ARGV, opts)
   when "setup"
     track.setup
   when "delete"  # parse copy options

@@ -34,6 +34,7 @@ class TrackGit
 
   def setup()
     tracker = prompt("What tracker are you using? ")
+    tracker.downcase!
     until @supported.include?(tracker)
       puts "Tracker not supported, sorry. "
       tracker = prompt("What tracker are you using? ")
