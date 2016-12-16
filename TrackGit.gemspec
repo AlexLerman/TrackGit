@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'trackgit'
-  s.version     = '0.1.2'
+  s.version     = '0.1.3'
   s.executables << 'tg'
   s.date        = '2016-06-14'
   s.summary     = "Interface for automatic project tracking for git"
