@@ -41,9 +41,27 @@ class TrackGit
     end
     @track = setTracker(tracker)
     repo = nil
-    username = prompt("What's your username? ")
-    password = promptPassword("What's your password? ")
-    login([username, password])
+    signIn = prompt("Sign in with [1] credentials (default) or [2] auth_token? ")
+    if signIn == "2"
+      token = prompt("What's your token? ")
+      @track.signInWithToken(token)
+    else
+      username = prompt("What's your username? ")
+      password = promptPassword("What's your password? ")
+      tfa = prompt("Do you use two factor authentication? [Y/n] ")
+      if tfa == "" or tfa[0].downcase == "y"
+        begin
+          tfa_key = prompt("What's your two factor authentication code? ")
+          @track.signInWith2FA(username, password, tfa_key, repo)
+        rescue
+          puts "you likely already have an auth token for this account and directory. Look at your tracker auth tokens."
+          token = prompt("What's your token? ")
+          @track.signInWithToken(token)
+        end
+      else
+        @track.signInWithCredentials(username, password)
+      end
+    end
     while !validRepo(repo)
       repo = prompt("What is your repository? ")
     end
@@ -115,6 +133,23 @@ class TrackGit
     end
   end
 
+  def checkoutIssueByID(issue_id)
+    if issue_id == "master" || issue_id == "prod"
+      @g.branch(issue_id).checkout
+      return
+    end
+
+    issue = @track.findIssueByID(story)
+    if  issue != nil
+      puts "found the issue"
+      story = BranchName.new(issue.title, issue.number).to_branch_name
+      @g.branch(story).checkout
+    else
+      puts "There iss no issue by zat ID"
+      # add option to create story if none exists
+    end
+  end
+
   def deleteBranch(branch)
     findBranch(branch).delete
   end
@@ -172,7 +207,7 @@ class TrackGit
       checkoutIssue("master")
       merge(branch)
       up()
-      puts "\n\nBranch merged. Local master pushed to master\n"
+      puts "\n\nBranch merged. Local master pushed to origin\n"
     else
       puts "\n\nUncommited changes. Stash or commit!"
     end
@@ -221,7 +256,7 @@ class TrackGit
 
   def getIssueId(message)
   end
-  
+
   private
 
   def getCommits

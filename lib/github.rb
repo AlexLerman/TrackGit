@@ -47,6 +47,10 @@ class Github < Track
     @project.issue(CONFIG.repo, BranchName.new(branch, 0).get_issue_number)
   end
 
+  def findIssueByID(issue_id)
+    @project.issue(CONFIG.repo, issue_id)
+  end
+
   def resolveIssue(branch)
     @project.close_issue(CONFIG.repo, findIssue(branch).number, {:assignee => CONFIG.login} )
   end
@@ -90,25 +94,45 @@ class Github < Track
   end
 
   def signInWithToken(token)
+    CONFIG.auth_token = token
   end
 
 
   def signInWithCredentials(user, password)
     CONFIG.login = user
     CONFIG.password = password
+    #client = Octokit::Client.new(:login => user, :password => password)
+    #CONFIG.auth_token = client.create_authorization(:scopes => ["user", "repo"], :note => "TrackGit Auth Token")
+
   end
 
+  def signInWith2FA(user, password, tfa_key, repo)
+    CONFIG.login = user
+    CONFIG.password = password
+    client = Octokit::Client.new(:login => user, :password => password)
+    note = "TrackGit Auth Token for " + `git rev-parse --show-toplevel`.chomp
+    puts "Creating " + note
+    auth_token = client.create_authorization(:scopes => ["user", "repo"], :note => note, :headers => { "X-GitHub-OTP" => tfa_key.to_s })
+    CONFIG.auth_token = auth_token.to_h[:token]
+  end
 
   def getRepo(repo)
+    Octokit.configure do |c|
+    end
     Octokit.repo repo
   rescue Octokit::InvalidRepository
   end
 
-
   def getProject
-    Octokit.configure do |c|
-      c.login = CONFIG.login
-      c.password = CONFIG.password
+    if CONFIG.auth_token
+      Octokit.configure do |c|
+        c.access_token = CONFIG.auth_token
+      end
+    else
+      Octokit.configure do |c|
+        c.login = CONFIG.login
+        c.password = CONFIG.password
+      end
     end
     Octokit.client
 

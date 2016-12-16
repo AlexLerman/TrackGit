@@ -25,13 +25,13 @@ global_opts = Trollop::options do
   banner <<-EOS
 TrackGit integretes your issue tracker of choice with your git repo for easy commandline usage.
 Usage:
-       tg [commands] [options] <issues>+
+       tg <commands> [options] [args]+
 
 To start using TrackGit:
       setup                   Sets repository and user info
       setRepo                 Change repository
       setTracker              Change tracker
-      login [username] [pass] Update login credentials
+      login <username> <pass> Update login credentials
 
 Tracker functions:
       listIssues              Lists all open issues. Can be filtered by:
@@ -39,15 +39,15 @@ Tracker functions:
                               --creator | -c
                               --milestone
                               --mentioned
-      closeIssue [issue]      Close designated issue
+      closeIssue <issue id>   Close designated issue
                               --comment | -c Close with comment
       getComments             Gets all comments on current issue. Impractical for long chains
-      addComment [comment]    Adds comment to current branch.
+      addComment <comment>    Adds comment to current branch.
 
 Integrated functions:
-      createIssue [title]     Create an issue.
+      createIssue <title>     Create an issue.
                               --branch | -b option for creating the branch as well
-      checkout [Issue number] Checkout branch by issue number
+      checkout <issue id>     Checkout branch by issue number
       commit                  Adds issue number to commit message. See `git help commit` for more detail
       finish                  Merges current branch onto master, closes associated issue and pushes.
 
@@ -68,7 +68,7 @@ when "checkout" # parse delete options
     Trollop::options do
       opt :test, "test"
     end
-    track.checkoutIssue(ARGV[0])
+    track.checkoutIssueByID(ARGV[0])
   when "createIssue"  # parse copy options
     opts = Trollop::options do
       opt :branch, "branch", :short => "-b"
